@@ -1,0 +1,13 @@
+#sidebar_plugin_pause_management_wrapper > div.accordion-heading {
+	line-height: 30px;
+}
+
+#sidebar_plugin_pause_management_wrapper > div.accordion-heading > div.accordion-heading-button.btn-group {
+	padding-right: 10px;
+}
+
+#sidebar_plugin_pause_management_wrapper > div.accordion-heading > div > a {
+	font-size: 18px;
+	line-height: 30px;
+	padding: 8px 8px;
+}

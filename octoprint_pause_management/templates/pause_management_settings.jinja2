@@ -1,0 +1,39 @@
+<h4>Pause Management Settings</h4>
+<form class="form-vertical">
+    <div class="control-group">
+		<label class="control-label">{{ _('Pause Command to Ignore') }}</label>
+		<div class="controls">
+            <input type="text" class="input-block-level" data-bind="value: settingsViewModel.settings.plugins.pause_management.pause_command_ignored">
+		</div>
+	</div>
+    <div class="control-group">
+		<label class="control-label">{{ _('Pause Command to Inject') }}</label>
+		<div class="controls">
+            <input type="text" class="input-block-level" data-bind="value: settingsViewModel.settings.plugins.pause_management.pause_command">
+		</div>
+	</div>
+    <div class="control-group">
+		<label class="control-label">{{ _('Layer Indicator') }}</label>
+		<div class="controls">
+            <input type="text" class="input-block-level" data-bind="value: settingsViewModel.settings.plugins.pause_management.layer_indicator">
+		</div>
+	</div>
+</form>
+
+<div id="new_position_modal" class="modal hide fade">
+	<div class="modal-header">
+		<a href="#" class="close" data-dismiss="modal" aria-hidden="true">&times;</a>
+		<h3>{{ _('Add Pause Position') }}</h3>
+	</div>
+	<div class="modal-body">
+        <div class="control-group">
+            <label class="control-label">{{ _('Position to Insert a Pause') }}</label>
+            <div class="controls">
+                <input type="text" class="input-block-level" data-bind="value: new_pause_position">
+            </div>
+	    </div>
+    </div>
+	<div class="modal-footer">
+		<a href="#" class="btn" data-bind="click: insertPosition">Add</a> <a href="#" class="btn" data-dismiss="modal" aria-hidden="true">{{ _('Close') }}</a>
+	</div>
+</div>
