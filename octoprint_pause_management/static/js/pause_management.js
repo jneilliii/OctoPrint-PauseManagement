@@ -9,8 +9,13 @@ $(function() {
         var self = this;
 
         self.settingsViewModel = parameters[0];
-        self.pause_positions = ko.observableArray();
         self.new_pause_position = ko.observable();
+
+        self.onBeforeBinding = function() {
+            self.pause_positions_sorted = ko.pureComputed(function() {
+                return self.settingsViewModel.settings.plugins.pause_management.pause_positions.sorted().reverse();
+            });
+        };
 
         self.onToggleIgnoreEnabled = function(data) {
             if(self.settingsViewModel.settings.plugins.pause_management.ignore_enabled()) {
@@ -19,25 +24,25 @@ $(function() {
                 self.settingsViewModel.settings.plugins.pause_management.ignore_enabled(true);
             }
             self.settingsViewModel.saveData();
-        }
+        };
 
         self.addPausePosition = function(data) {
             self.new_pause_position("");
             $("#new_position_modal").modal("show");
-        }
+        };
 
         self.insertPosition = function() {
-            if(self.new_pause_position() !== "") {
+            if(self.new_pause_position() !== "" && !self.settingsViewModel.settings.plugins.pause_management.pause_positions().includes(self.new_pause_position())) {
                 self.settingsViewModel.settings.plugins.pause_management.pause_positions.push(self.new_pause_position());
                 self.settingsViewModel.saveData();
-                $("#new_position_modal").modal("hide");
             }
-        }
+            $("#new_position_modal").modal("hide");
+        };
 
         self.removePausePosition = function(data) {
             self.settingsViewModel.settings.plugins.pause_management.pause_positions.remove(data);
             self.settingsViewModel.saveData();
-        }
+        };
     }
 
     OCTOPRINT_VIEWMODELS.push({
