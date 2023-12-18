@@ -3,11 +3,13 @@ from __future__ import absolute_import
 
 import octoprint.plugin
 import re
+from octoprint.events import Events
 
 
 class Pause_managementPlugin(octoprint.plugin.SettingsPlugin,
                              octoprint.plugin.AssetPlugin,
-                             octoprint.plugin.TemplatePlugin
+                             octoprint.plugin.TemplatePlugin,
+                             octoprint.plugin.EventHandlerPlugin
                              ):
 
     # ~~ SettingsPlugin mixin
@@ -29,6 +31,34 @@ class Pause_managementPlugin(octoprint.plugin.SettingsPlugin,
             "js": ["js/pause_management.js"]
         }
 
+    # ~~ TemplatePlugin mixin
+    def get_template_configs(self):
+        return [{"type": "settings", "template": "pause_management_settings.jinja2", "custom_bindings": True},
+                {"type": "sidebar", "icon": "pause", "custom_bindings": True,
+                 "template": "pause_management_sidebar.jinja2",
+                 "template_header": "pause_management_sidebar_header.jinja2"}]
+
+    # ~~ EventHandlePlugin mixin
+    def on_event(self, event, payload):
+        if event == Events.FILE_SELECTED:
+            self._logger.debug(f"Processing file: {payload['path']}")
+            regex = r"(?:^" + re.escape(self._settings.get(["layer_indicator"])) + " (\d+\.?\d*))(?:(?!^" + re.escape(self._settings.get(["layer_indicator"])) + ").*\n)*(?:^" + re.escape(self._settings.get(["pause_command"])) + ")"
+            gcode_filename = self._file_manager.path_on_disk("local", payload["path"])
+
+            with open(gcode_filename, "rb") as gcode_file:
+                test_bytes = gcode_file.read()
+
+            if test_bytes:
+                test_str = test_bytes.decode("utf-8", "ignore")
+
+            matches = re.findall(regex, test_str, re.MULTILINE)
+            self._logger.debug(f"Found matches: {matches}")
+            self._settings.set(["pause_positions"], matches)
+            self._settings.save(trigger_event=True)
+
+
+
+
     # ~~ gcode queueing hook
     def process_gcode(self, comm_instance, phase, cmd, cmd_type, gcode, *args, **kwargs):
         # check to see if we need to inject a pause
@@ -46,13 +76,6 @@ class Pause_managementPlugin(octoprint.plugin.SettingsPlugin,
         if self._settings.get_boolean(["ignore_enabled"]):
             self._logger.debug(f"Ignoring pause command: {cmd}")
             return None,
-
-    # ~~ TemplatePlugin mixin
-    def get_template_configs(self):
-        return [{"type": "settings", "template": "pause_management_settings.jinja2", "custom_bindings": True},
-                {"type": "sidebar", "icon": "pause", "custom_bindings": True,
-                 "template": "pause_management_sidebar.jinja2",
-                 "template_header": "pause_management_sidebar_header.jinja2"}]
 
     # ~~ Softwareupdate hook
 
