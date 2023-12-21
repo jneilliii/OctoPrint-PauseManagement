@@ -1,5 +1,5 @@
 <div class="row-fluid" data-bind="foreach: pause_positions_sorted">
     <div class="row-fluid">
-        <div class="span11" data-bind="text: $data"></div><div class="span1"><a href="#" data-bind="click: $root.removePausePosition"><i class="fa fa-trash-alt "></i></a></div>
+        <div class="span11" data-bind="text: $data, css: {muted: !$root.settingsViewModel.settings.plugins.pause_management.ignore_enabled()}"></div><div class="span1" data-bind="visible: $root.settingsViewModel.settings.plugins.pause_management.ignore_enabled()"><a href="#" data-bind="click: $root.removePausePosition"><i class="fa fa-trash-alt"></i></a></div>
     </div>
 </div>

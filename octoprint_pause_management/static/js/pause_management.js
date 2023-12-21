@@ -27,8 +27,17 @@ $(function() {
         };
 
         self.addPausePosition = function(data) {
-            self.new_pause_position("");
-            $("#new_position_modal").modal("show");
+            if(self.settingsViewModel.settings.plugins.pause_management.ignore_enabled()) {
+                self.new_pause_position("");
+                $("#new_position_modal").modal("show");
+            }
+        };
+
+        self.removeAllPausePositions = function (data) {
+            if(self.settingsViewModel.settings.plugins.pause_management.ignore_enabled()) {
+                self.settingsViewModel.settings.plugins.pause_management.pause_positions.removeAll();
+                self.settingsViewModel.saveData();
+            }
         };
 
         self.insertPosition = function() {

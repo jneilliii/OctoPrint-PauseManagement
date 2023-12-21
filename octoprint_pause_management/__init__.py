@@ -56,11 +56,12 @@ class Pause_managementPlugin(octoprint.plugin.SettingsPlugin,
             self._settings.set(["pause_positions"], matches)
             self._settings.save(trigger_event=True)
 
-
-
-
     # ~~ gcode queueing hook
     def process_gcode(self, comm_instance, phase, cmd, cmd_type, gcode, *args, **kwargs):
+        # exit early if management is not enabled
+        if not self._settings.get_boolean(["ignore_enabled"]):
+            return
+
         # check to see if we need to inject a pause
         if cmd and cmd.startswith(self._settings.get(["layer_indicator"])):
             injection_check = cmd.replace(self._settings.get(["layer_indicator"]), "").strip()
@@ -72,10 +73,8 @@ class Pause_managementPlugin(octoprint.plugin.SettingsPlugin,
         if gcode != self._settings.get(["pause_command_ignored"]):
             return
 
-        # remove the command from the queue for sending to printer
-        if self._settings.get_boolean(["ignore_enabled"]):
-            self._logger.debug(f"Ignoring pause command: {cmd}")
-            return None,
+        self._logger.debug(f"Ignoring pause command: {cmd}")
+        return None,
 
     # ~~ Softwareupdate hook
 
