@@ -66,7 +66,8 @@ class Pause_managementPlugin(octoprint.plugin.SettingsPlugin,
         if cmd and cmd.startswith(self._settings.get(["layer_indicator"])):
             injection_check = cmd.replace(self._settings.get(["layer_indicator"]), "").strip()
             if injection_check in self._settings.get(["pause_positions"]):
-                self._logger.debug(f"Injecting '{self._settings.get(["pause_command"])}' at position: {injection_check}")
+                pause_command = self._settings.get(["pause_command"])
+                self._logger.debug(f"Injecting '{pause_command}' at position: {injection_check}")
                 return [cmd, self._settings.get(["pause_command"])]
 
         # exit early otherwise and return original line
