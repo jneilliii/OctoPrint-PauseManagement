@@ -23,12 +23,24 @@ Use the + button to inject a configurable pause command at provided height or la
 
 In order for the injection of pause commands to work a configurable layer indicator needs to be added to your slicer's before layer change gcode script.
 
-![prusa screenshot](screenshot_prusa.png)
+### PrusaSlicer
 
 For PrusaSlicer that setting can be found in Printer Settings > Custom G-code. You have a couple of options to use based on how you want to enter pause positions in the sidebar.
 
 - **Height**: `@PAUSE_POSITION [layer_z]`
 - **Layer Number**: `@PAUSE_POSITION [layer_num]`
+
+![prusa screenshot](screenshot_prusa.png)
+
+### Cura
+
+Thanks to [@CortezSMz](https://github.com/CortezSMz) for this information, setup in Cura will require the Search and Replace post-processing script with the following settings.
+
+- Search: `\;LAYER\:(\d+)`
+- Replace: `;LAYER:\1\n@PAUSE_POSITION \1`
+- Use Regular Expressions: _must_ be checked.
+
+![image](https://github.com/jneilliii/OctoPrint-PauseManagement/assets/5249455/c52e83a7-8e20-410a-b5e6-e855609feae0)
 
 ---
 
