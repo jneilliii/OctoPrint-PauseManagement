@@ -14,6 +14,10 @@ class Pause_managementPlugin(octoprint.plugin.SettingsPlugin,
 
     # ~~ SettingsPlugin mixin
 
+    def __init__(self):
+        super().__init__()
+        self.ignore_file = None
+
     def get_settings_defaults(self):
         return {
             "pause_positions": [],
@@ -42,6 +46,7 @@ class Pause_managementPlugin(octoprint.plugin.SettingsPlugin,
     def on_event(self, event, payload):
         if event == Events.FILE_SELECTED:
             self._logger.debug(f"Processing file: {payload['path']}")
+            self.ignore_file = True
             regex = r"(?:^" + re.escape(self._settings.get(["layer_indicator"])) + " (\d+\.?\d*))(?:(?!^" + re.escape(self._settings.get(["layer_indicator"])) + ").*\n)*(?:^" + re.escape(self._settings.get(["pause_command"])) + ")"
             gcode_filename = self._file_manager.path_on_disk("local", payload["path"])
 
@@ -52,14 +57,16 @@ class Pause_managementPlugin(octoprint.plugin.SettingsPlugin,
                 test_str = test_bytes.decode("utf-8", "ignore")
 
             matches = re.findall(regex, test_str, re.MULTILINE)
+            if len(matches) > 0:
+                self.ignore_file = False
             self._logger.debug(f"Found matches: {matches}")
             self._settings.set(["pause_positions"], matches)
             self._settings.save(trigger_event=True)
 
     # ~~ gcode queueing hook
     def process_gcode(self, comm_instance, phase, cmd, cmd_type, gcode, *args, **kwargs):
-        # exit early if management is not enabled
-        if not self._settings.get_boolean(["ignore_enabled"]):
+        # exit early if management is not enabled or ignore_file flag is set
+        if not self._settings.get_boolean(["ignore_enabled"]) or self.ignore_file:
             return
 
         # check to see if we need to inject a pause
