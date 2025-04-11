@@ -46,8 +46,10 @@ class Pause_managementPlugin(octoprint.plugin.SettingsPlugin,
     def on_event(self, event, payload):
         if event == Events.FILE_SELECTED:
             self._logger.debug(f"Processing file: {payload['path']}")
-            self.ignore_file = True
-            regex = r"(?:^" + re.escape(self._settings.get(["layer_indicator"])) + " (\d+\.?\d*))(?:(?!^" + re.escape(self._settings.get(["layer_indicator"])) + ").*\n)*(?:^" + re.escape(self._settings.get(["pause_command"])) + ")"
+            self.ignore_file = False
+            regex_pause_and_indicator_in_file = r"(?:^" + re.escape(self._settings.get(["layer_indicator"])) + " (\d+\.?\d*))(?:(?!^" + re.escape(self._settings.get(["layer_indicator"])) + ").*\n)*(?:^" + re.escape(self._settings.get(["pause_command"])) + ")"
+            regex_pause_exists_in_file = r"(?:^" + re.escape(self._settings.get(["pause_command"])) + ")"
+            regex_indicator_in_file = r"(?:^" + re.escape(self._settings.get(["layer_indicator"])) + " (\d+\.?\d*))"
             gcode_filename = self._file_manager.path_on_disk("local", payload["path"])
 
             with open(gcode_filename, "rb") as gcode_file:
@@ -56,10 +58,12 @@ class Pause_managementPlugin(octoprint.plugin.SettingsPlugin,
             if test_bytes:
                 test_str = test_bytes.decode("utf-8", "ignore")
 
-            matches = re.findall(regex, test_str, re.MULTILINE)
-            if len(matches) > 0:
-                self.ignore_file = False
-            self._logger.debug(f"Found matches: {matches}")
+            matches = re.findall(regex_pause_and_indicator_in_file, test_str, re.MULTILINE)
+            if re.search(regex_pause_exists_in_file, test_str, re.MULTILINE) and not re.search(regex_indicator_in_file, test_str, re.MULTILINE):
+                self.ignore_file = True
+
+            self._logger.debug(f"Ignoring file because of missing pause indicators: {self.ignore_file}")
+            self._logger.debug(f"Found existing pauses in file: {matches}")
             self._settings.set(["pause_positions"], matches)
             self._settings.save(trigger_event=True)
 
