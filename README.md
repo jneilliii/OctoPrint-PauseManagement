@@ -40,7 +40,16 @@ Thanks to [@CortezSMz](https://github.com/CortezSMz) for this information, setup
 - Replace: `;LAYER:\1\n@PAUSE_POSITION \1`
 - Use Regular Expressions: _must_ be checked.
 
-![image](https://github.com/jneilliii/OctoPrint-PauseManagement/assets/5249455/c52e83a7-8e20-410a-b5e6-e855609feae0)
+![image](screenshot_cura.png)
+
+### Simplify3D
+
+Thanks to [@mjfuchs71](https://github.com/mjfuchs71) for this information, for Simplify3D you use a layer change script process. You have a couple of options to use based on how you want to enter pause positions in the sidebar.
+
+- **Height**: `@PAUSE_POSITION [current_Z_position]`
+- **Layer Number**: `@PAUSE_POSITION [current_layer_number]`
+
+![image](screenshot_simplify3d.png)
 
 ---
 
